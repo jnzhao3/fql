@@ -1,0 +1,2 @@
+evaluation/prev_qpos,evaluation/prev_qvel,evaluation/qpos,evaluation/qvel,evaluation/control,evaluation/time,evaluation/success,evaluation/total.timesteps,evaluation/episode.final_reward,evaluation/episode.return,evaluation/episode.length,evaluation/episode.duration,step
+-0.16357404295491537,0.002265261316945489,-0.16355040925278203,0.0007574857292951148,4.8014934763590125,10.100000000000042,0.0,5100.0,-1.0,-200.0,200.0,0.5223962831497192,1

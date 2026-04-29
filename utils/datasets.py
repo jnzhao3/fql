@@ -54,6 +54,8 @@ class Dataset(FrozenDict):
         self.frame_stack = None  # Number of frames to stack; set outside the class.
         self.p_aug = None  # Image augmentation probability; set outside the class.
         self.return_next_actions = False  # Whether to additionally return next actions; set outside the class.
+        self.n_step = 1  # N-step return horizon; set outside the class.
+        self.discount = 0.99  # Discount factor for n-step returns; set outside the class.
 
         # Compute terminal and initial locations.
         self.terminal_locs = np.nonzero(self['terminals'] > 0)[0]
@@ -68,6 +70,25 @@ class Dataset(FrozenDict):
         if idxs is None:
             idxs = self.get_random_idxs(batch_size)
         batch = self.get_subset(idxs)
+        if self.n_step > 1:
+            # Compute n-step returns, clipping at episode boundaries via terminal_locs.
+            final_state_idxs = self.terminal_locs[np.searchsorted(self.terminal_locs, idxs)]
+            offsets = np.arange(self.n_step)  # (n,)
+            step_idxs = np.minimum(idxs[:, None] + offsets[None, :], final_state_idxs[:, None])  # (B, n)
+            step_rewards = self['rewards'][step_idxs]  # (B, n)
+            step_masks = self['masks'][step_idxs]      # (B, n)
+            discounts = self.discount ** offsets        # (n,)
+            # Exclusive cumulative product: weight[k] = prod(masks[0..k-1]), so reward at step k
+            # is only included if the episode was still alive before step k.
+            cum_alive = np.concatenate(
+                [np.ones((len(idxs), 1)), np.cumprod(step_masks[:, :-1], axis=1)], axis=1
+            )  # (B, n)
+            batch['rewards'] = (discounts[None, :] * cum_alive * step_rewards).sum(axis=1).astype(np.float32)
+            batch['masks'] = step_masks.prod(axis=1).astype(np.float32)
+            next_idxs = np.minimum(idxs + self.n_step - 1, self.size - 1)
+            batch['next_observations'] = jax.tree_util.tree_map(
+                lambda arr: arr[next_idxs], self['next_observations']
+            )
         if self.frame_stack is not None:
             # Stack frames.
             initial_state_idxs = self.initial_locs[np.searchsorted(self.initial_locs, idxs, side='right') - 1]

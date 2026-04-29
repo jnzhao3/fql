@@ -81,11 +81,13 @@ def main(_):
             dict(train_dataset), size=max(FLAGS.buffer_size, train_dataset.size + 1)
         )
         replay_buffer = train_dataset
-    # Set p_aug and frame_stack.
+    # Set p_aug, frame_stack, and n_step.
     for dataset in [train_dataset, val_dataset, replay_buffer]:
         if dataset is not None:
             dataset.p_aug = FLAGS.p_aug
             dataset.frame_stack = FLAGS.frame_stack
+            dataset.n_step = config['n_step']
+            dataset.discount = config['discount']
             if config['agent_name'] == 'rebrac':
                 dataset.return_next_actions = True
 
