@@ -32,8 +32,8 @@ def make_command(
         'agent.discount': 0.999,
         'agent.n_step': 25,
         'agent.batch_size': 1024,
-        'agent.actor_hidden_dims': "'(1024, 1024, 1024, 1024)'",
-        'agent.value_hidden_dims': "'(1024, 1024, 1024, 1024)'",
+        'agent.actor_hidden_dims': r'\(1024,1024,1024,1024\)',
+        'agent.value_hidden_dims': r'\(1024,1024,1024,1024\)',
         'seed': seed,
         'run_group': run_group + '_debug' if debug else run_group,
     }

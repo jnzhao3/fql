@@ -25,7 +25,7 @@ micromamba activate aorl
 
 
 declare -a commands=(
-  [1]='MUJOCO_GL=egl python main.py --env_name=humanoidmaze-giant-navigate-singletask-task1-v0 --agent.alpha=100 --agent.discount=0.999 --agent.n_step=25 --agent.batch_size=1024 --agent.actor_hidden_dims='(1024, 1024, 1024, 1024)' --agent.value_hidden_dims='(1024, 1024, 1024, 1024)' --seed=0 --run_group=2026-04-30-fql-02_debug'
+  [1]='MUJOCO_GL=egl python main.py --env_name=humanoidmaze-giant-navigate-singletask-task1-v0 --agent.alpha=100 --agent.discount=0.999 --agent.n_step=25 --agent.batch_size=1024 --agent.actor_hidden_dims=\(1024,1024,1024,1024\) --agent.value_hidden_dims=\(1024,1024,1024,1024\) --seed=0 --run_group=2026-04-30-fql-02_debug'
 )
 
 parallel --delay 5s --linebuffer -j 1 {1} ::: "${commands[@]:$COM_ID_S:$PARALLEL_N}"
